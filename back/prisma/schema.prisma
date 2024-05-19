@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  ID_Property Int      @id @default(autoincrement())
+  Property    String   @db.VarChar
+  Ticket      Ticket[]
+}
+
+model Status {
+  ID_Status Int      @id @default(autoincrement())
+  Status    String   @db.VarChar
+  Ticket    Ticket[]
+}
+
+model Ticket {
+  ID_Ticket                       Int      @id @default(autoincrement())
+  Resolution                      String?  @db.VarChar
+  Date_Ticket                     DateTime @db.Date
+  ID_User                         Int
+  ID_Status                       Int
+  ID_Property                     Int
+  ID_Technician                   Int?
+  Description                     String
+  Property                        Property @relation(fields: [ID_Property], references: [ID_Property], onDelete: NoAction, onUpdate: NoAction)
+  Status                          Status   @relation(fields: [ID_Status], references: [ID_Status], onDelete: NoAction, onUpdate: NoAction)
+  User_Ticket_ID_TechnicianToUser User?    @relation("Ticket_ID_TechnicianToUser", fields: [ID_Technician], references: [ID_User], onDelete: NoAction, onUpdate: NoAction)
+  User_Ticket_ID_UserToUser       User     @relation("Ticket_ID_UserToUser", fields: [ID_User], references: [ID_User], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Type_User {
+  ID_Type Int    @id @default(autoincrement())
+  Tipo    String @db.VarChar
+  User    User[]
+}
+
+model User {
+  ID_User                           Int       @id @default(autoincrement())
+  Name                              String    @db.VarChar
+  Email                             String    @unique @db.VarChar
+  Password                          String    @db.VarChar
+  ID_Type                           Int
+  Ticket_Ticket_ID_TechnicianToUser Ticket[]  @relation("Ticket_ID_TechnicianToUser")
+  Ticket_Ticket_ID_UserToUser       Ticket[]  @relation("Ticket_ID_UserToUser")
+  Type_User                         Type_User @relation(fields: [ID_Type], references: [ID_Type], onDelete: NoAction, onUpdate: NoAction)
+}
